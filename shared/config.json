@@ -1,0 +1,14 @@
+{
+  "development": {
+    "conductor_url": "http://localhost:8050/api",
+    "httpworker_bind_address": "0.0.0.0:50051",
+    "httpworker_address": "localhost:50051",
+    "overall_log_level": "debug"
+  },
+  "development-docker": {
+    "conductor_url": "http://conductor-server:8080/api",
+    "httpworker_bind_address": "0.0.0.0:50051",
+    "httpworker_address": "http-worker-downloader:50051",
+    "overall_log_level": "debug"
+  }
+}
