@@ -1,5 +1,5 @@
-const {protoDescriptor, config} = require('../shared/utils');
-const grpc = require('grpc');
+import {protoDescriptor, config} from '../shared/utils';
+import grpc from 'grpc';
 
 const httpproto = protoDescriptor().httpproto;
 
@@ -9,11 +9,10 @@ const httpproto = protoDescriptor().httpproto;
  * @param httpPayload body of the request (in case of POST/PUT...)
  */
 
-let sendGrpcRequest = (options, httpPayload, callback) => {
-    const client = new httpproto.HttpWorker(config.httpworker_address,
+export const sendGrpcRequest = (options, httpPayload, callback) => {
+    const client = new httpproto.HttpWorker(config.HTTPWORKER_ADDRESS,
         grpc.credentials.createInsecure());
 
     client.executeHttp({requestOptions: JSON.stringify(options), httpPayload: httpPayload}, callback);
 }
 
-exports.sendGrpcRequest = sendGrpcRequest;

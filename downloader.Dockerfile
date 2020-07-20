@@ -8,4 +8,4 @@ COPY package.json .
 COPY yarn.lock .
 RUN yarn install --frozen-lockfile && yarn cache clean
 
-CMD ["node", "--unhandled-rejections=strict", "downloader/downloader-grpc-server"]
+CMD ["yarn start:downloader"]

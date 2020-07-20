@@ -1,9 +1,9 @@
-const ConductorClient = require('conductor-client').default
-const {sampleWorkflowDef} = require('../shared/defs');
-const {config} = require('../shared/utils');
+import {default as ConductorClient} from 'conductor-client'
+import {sampleWorkflowDef} from '../shared/defs';
+import {config} from '../shared/utils';
 
 const conductorClient = new ConductorClient({
-    baseURL: config.conductor_url
+    baseURL: config.CONDUCTOR_URL
 });
 
 const input = {

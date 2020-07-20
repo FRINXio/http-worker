@@ -1,15 +1,16 @@
-const winston = require('winston');
-const PROTO_PATH = __dirname + '/http.proto';
-const grpc = require('grpc');
-const protoLoader = require('@grpc/proto-loader');
-const configs = require('../shared/config.json');
+import winston from 'winston';
+import grpc from 'grpc';
+import {loadSync} from '@grpc/proto-loader';
+import dotenv from "dotenv";
 
 // retrieve config boilerplate
-const environment = process.env.NODE_ENV || 'development';
-const config = configs[environment];
+dotenv.config();
+const config = process.env;
+
+const PROTO_PATH = __dirname + '/http.proto';
 
 // gRPC boilerplate
-const packageDefinition = protoLoader.loadSync(
+const packageDefinition = loadSync(
     PROTO_PATH,
     {keepCase: true,
         longs: String,
@@ -91,9 +92,9 @@ let createGrpcResponse = (status, statusCode, body, cookies, headers) => {
     }
 }
 
-let supportedEncodings = ["ascii", "utf8", "utf-8", "utf16le", "ucs2", "ucs-2", "base64", "latin1", "binary", "hex"];
+const supportedEncodings = ["ascii", "utf8", "utf-8", "utf16le", "ucs2", "ucs-2", "base64", "latin1", "binary", "hex"];
 
-let getEncoding = function(headers) {
+const getEncoding = function(headers) {
     let result = 'utf-8'; //default encoding
 
     Object.keys(headers).forEach(function (key) {
@@ -116,11 +117,4 @@ let parseOptions = options => {
     return result;
 }
 
-exports.conductorHttpParamsToNodejsHttpParams = conductorHttpParamsToNodejsHttpParams;
-exports.createLogger = createLogger;
-exports.supportedEncodings = supportedEncodings;
-exports.createGrpcResponse = createGrpcResponse;
-exports.getEncoding = getEncoding;
-exports.protoDescriptor = protoDescriptor;
-exports.config = config;
-exports.parseOptions = parseOptions;
+export {conductorHttpParamsToNodejsHttpParams, createLogger, supportedEncodings, createGrpcResponse, getEncoding, protoDescriptor, config, parseOptions}

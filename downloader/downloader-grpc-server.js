@@ -1,13 +1,13 @@
-const grpc = require('grpc');
-const http = require('http');
-const https = require('https');
-const setCookie = require('set-cookie-parser');
+import grpc from 'grpc';
+import http from 'http';
+import https from 'https';
+import setCookie from 'set-cookie-parser';
 
-const {protoDescriptor, config, createLogger, supportedEncodings, createGrpcResponse, getEncoding, parseOptions} = require('../shared/utils');
+import {createLogger, supportedEncodings, createGrpcResponse, getEncoding, protoDescriptor, config, parseOptions} from '../shared/utils.js';
 
 const completed = 'COMPLETED', failed = 'FAILED';
 
-const logger = createLogger('http-worker', config.overall_log_level);
+const logger = createLogger('http-worker', config.OVERALL_LOG_LEVEL);
 
 const httpproto = protoDescriptor().httpproto;
 
@@ -108,6 +108,6 @@ let getServer = function () {
 }
 
 const routeServer = getServer();
-logger.info(`Starting http-worker on ${config.httpworker_bind_address}`)
-routeServer.bind(config.httpworker_bind_address, grpc.ServerCredentials.createInsecure());
+logger.info(`Starting http-worker on ${config.HTTPWORKER_BIND_ADDRESS}`)
+routeServer.bind(config.HTTPWORKER_BIND_ADDRESS, grpc.ServerCredentials.createInsecure());
 routeServer.start();

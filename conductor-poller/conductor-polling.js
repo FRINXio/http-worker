@@ -1,13 +1,13 @@
-const ConductorClient = require('conductor-client').default
-const {sendGrpcRequest} = require('./grpc-client');
-const {conductorHttpParamsToNodejsHttpParams} = require('../shared/utils');
-const {httpTaskDef} = require('../shared/defs');
-const {createLogger, config} = require('../shared/utils');
+import {default as ConductorClient} from 'conductor-client';
+import {sendGrpcRequest} from './grpc-client';
+import {conductorHttpParamsToNodejsHttpParams} from '../shared/utils';
+import {httpTaskDef} from '../shared/defs';
+import {createLogger, config} from '../shared/utils';
 
-const logger = createLogger('conductor-poller', config.poller_log, config.console_log_level, config.overall_log_level);
+const logger = createLogger('conductor-poller', config.OVERALL_LOG_LEVEL);
 
 const conductorClient = new ConductorClient({
-    baseURL: config.conductor_url
+    baseURL: config.CONDUCTOR_URL
 });
 
 /**
@@ -42,7 +42,7 @@ async function markWorkflowFailed(workflowInstanceId, taskId) {
 /**
  * registers polling for the http worker task
  */
-let registerHttpWorker = async () => conductorClient.registerWatcher(
+export const registerHttpWorker = async () => conductorClient.registerWatcher(
     httpTaskDef.name,
     async (data, updater) => {
         const input = data.inputData.http_request;
@@ -79,7 +79,5 @@ let registerHttpWorker = async () => conductorClient.registerWatcher(
     true
 );
 
-const registerTaskDef = async() => await conductorClient.registerTaskDefs([httpTaskDef]);
+export const registerTaskDef = async() => await conductorClient.registerTaskDefs([httpTaskDef]);
 
-exports.registerHttpWorker = registerHttpWorker;
-exports.registerTaskDef = registerTaskDef;
