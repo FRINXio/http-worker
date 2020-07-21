@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start:downloader": "node -r @babel/register downloader/downloader-grpc-server.js",
-    "start:poller": "node -r @babel/register conductor-poller/start-conductor-poller.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:downloader": "node --unhandled-rejections=strict -r @babel/register downloader/downloader-grpc-server.js",
+    "start:downloader-dev": "nodemon --unhandled-rejections=strict -r @babel/register downloader/downloader-grpc-server.js",
+    "start:poller": "node --unhandled-rejections=strict -r @babel/register conductor-poller/start-conductor-poller.js",
+    "start:poller-dev": "nodemon --unhandled-rejections=strict -r @babel/register conductor-poller/start-conductor-poller.js",
+    "it": "node --unhandled-rejections=strict -r @babel/register conductor-poller/httpworker-sample-workflow.js"
   },
   "dependencies": {
     "@babel/core": "^7.10.2",
@@ -24,5 +26,8 @@
     "set-cookie-parser": "^2.4.6",
     "superagent": "^5.2.2",
     "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }

@@ -9,7 +9,8 @@ export const httpTaskDef = {
     timeoutPolicy: 'TIME_OUT_WF',
     retryLogic: 'FIXED',
     retryDelaySeconds: 60,
-    responseTimeoutSeconds: 3600
+    // must be less or equal to timeoutSeconds
+    responseTimeoutSeconds: config.CONDUCTOR_TASK_TIMEOUT_IN_SECS
 };
 
 export const sampleWorkflowDef = {

@@ -1,11 +1,12 @@
 FROM node:12
-RUN npm install -g nodemon
 
 WORKDIR /http-worker
 COPY downloader/ downloader
 COPY shared/ shared
 COPY package.json .
 COPY yarn.lock .
+COPY babel.config.js .
+COPY .env .
 RUN yarn install --frozen-lockfile && yarn cache clean
 
-CMD ["yarn start:downloader"]
+CMD ["yarn", "run", "start:downloader"]

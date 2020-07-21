@@ -1,4 +1,4 @@
-FROM node:12 as http-worker
+FROM node:12
 RUN npm install -g nodemon
 
 WORKDIR /http-worker
@@ -6,6 +6,8 @@ COPY conductor-poller/ conductor-poller
 COPY shared/ shared
 COPY package.json .
 COPY yarn.lock .
+COPY babel.config.js .
+COPY .env .
 RUN yarn install --frozen-lockfile && yarn cache clean
 
-CMD ["yarn start:poller"]
+CMD ["yarn", "run", "start:poller"]

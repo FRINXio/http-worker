@@ -79,5 +79,12 @@ export const registerHttpWorker = async () => conductorClient.registerWatcher(
     true
 );
 
-export const registerTaskDef = async() => await conductorClient.registerTaskDefs([httpTaskDef]);
+export const registerTaskDef = async() => {
+    try {
+        await conductorClient.registerTaskDefs([httpTaskDef]);
+    } catch (err) {
+        console.error('Cannot register taskdef', err, err?.response?.data);
+        throw err;
+    }
+}
 
