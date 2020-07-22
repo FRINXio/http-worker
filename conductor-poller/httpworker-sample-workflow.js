@@ -1,6 +1,34 @@
 import {default as ConductorClient} from 'conductor-client'
-import {sampleWorkflowDef} from '../shared/defs';
 import {config} from '../shared/utils';
+import {taskDefName} from '../shared/defs';
+
+const tenantId = config.TESTING_TENANT_ID;
+let tenantIdPrefix = '';
+if (tenantId != null) {
+    console.log(`Using tenant Id ${tenantId}`);
+    tenantIdPrefix = tenantId + '___';
+}
+
+const sampleWorkflowDef = {
+    name: tenantIdPrefix + 'test_workflow',
+    description: 'test workflow',
+    version: 1,
+    tasks: [
+        {
+            name: taskDefName,
+            taskReferenceName: taskDefName,
+            inputParameters: {
+                http_request: '${workflow.input.http_request}'
+            },
+            type: 'SIMPLE',
+            startDelay: 0,
+            optional: false
+        }
+    ],
+    inputParameters: ['http_request'],
+    failureWorkflow: 'fail_rollback',
+    schemaVersion: 2
+}
 
 const conductorClient = new ConductorClient({
     baseURL: config.CONDUCTOR_URL

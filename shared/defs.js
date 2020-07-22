@@ -1,7 +1,9 @@
 import {config} from './utils';
 
+export const taskDefName = 'GLOBAL___HTTP_task';
+
 export const httpTaskDef = {
-    name: 'HTTP_task',
+    name: taskDefName,
     retryCount: config.CONDUCTOR_TASK_RETRY_COUNT,
     timeoutSeconds: config.CONDUCTOR_TASK_TIMEOUT_IN_SECS,
     inputKeys: ['http_request'],
@@ -12,24 +14,3 @@ export const httpTaskDef = {
     // must be less or equal to timeoutSeconds
     responseTimeoutSeconds: config.CONDUCTOR_TASK_TIMEOUT_IN_SECS
 };
-
-export const sampleWorkflowDef = {
-    name: 'test_workflow',
-    description: 'test workflow',
-    version: 1,
-    tasks: [
-        {
-            name: httpTaskDef.name,
-            taskReferenceName: httpTaskDef.name,
-            inputParameters: {
-                http_request: '${workflow.input.http_request}'
-            },
-            type: 'SIMPLE',
-            startDelay: 0,
-            optional: false
-        }
-    ],
-    inputParameters: ['http_request'],
-    failureWorkflow: 'fail_rollback',
-    schemaVersion: 2
-}

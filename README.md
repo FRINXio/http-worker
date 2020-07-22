@@ -19,7 +19,31 @@ Poller must be also connected to `private` to be able to connect to Conductor.
 Downloader must me connected to `public` to access internet.
 
 ## Testing
+### Automated testing
 To create a sample workflow with http task and execute it, run
 ```sh
 docker-compose exec http-worker-poller yarn run it
 ```
+
+## Manual testing
+After starting all containers, create new workflow with following raw task:
+```json
+{
+    "name": "GLOBAL___HTTP_task",
+    "taskReferenceName": "httpRequestTaskRef_FG32",
+    "inputParameters": {
+    "http_request": {
+        "uri": "${workflow.input.uri}",
+        "method": "GET",
+        "body": "",
+        "contentType": "application/json",
+        "headers": {},
+        "timeout": "3600"
+    }
+    },
+    "type": "SIMPLE",
+    "startDelay": 0,
+    "optional": false
+}
+```
+Run the workflow with an URL, output of the task will contain the download result.
