@@ -7,7 +7,7 @@
     "start:downloader-dev": "nodemon --unhandled-rejections=strict -r @babel/register downloader/downloader-grpc-server.js",
     "start:poller": "node --unhandled-rejections=strict -r @babel/register conductor-poller/start-conductor-poller.js",
     "start:poller-dev": "nodemon --unhandled-rejections=strict -r @babel/register conductor-poller/start-conductor-poller.js",
-    "it": "node --unhandled-rejections=strict -r @babel/register conductor-poller/httpworker-sample-workflow.js"
+    "integration-test": "node --unhandled-rejections=strict -r @babel/register conductor-poller/httpworker-sample-workflow.js"
   },
   "dependencies": {
     "@babel/core": "^7.10.2",

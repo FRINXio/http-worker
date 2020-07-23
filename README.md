@@ -22,7 +22,7 @@ Downloader must me connected to `public` to access internet.
 ### Automated testing
 To create a sample workflow with http task and execute it, run
 ```sh
-docker-compose exec http-worker-poller yarn run it
+docker-compose exec http-worker-poller yarn run integration-test
 ```
 
 ## Manual testing
