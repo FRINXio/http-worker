@@ -100,7 +100,7 @@ TEST_DELTE_WORKFLOW=true VAULT_ADDR=http://localhost:8200 CONDUCTOR_URL=http://l
 ```
 Last line should read `All OK`.
 
-Then it executes a workflow with http task that POSTs some data
+The test executes a workflow with http task that POSTs some data
 with secret variables to httpbin.org and then checks response.
 
 ## Manual testing
