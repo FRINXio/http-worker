@@ -10,7 +10,6 @@ async function main() {
     await registerHttpWorker();
 }
 
-
 async function mainWithRetry() {
     // --unhandled-rejections=strict is enabled, so connection issues
     // should restart this container.

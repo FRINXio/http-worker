@@ -7,6 +7,22 @@ import {default as VaultClient} from 'node-vault';
 
 const logger = createLogger('conductor-poller', config.OVERALL_LOG_LEVEL);
 
+// This is used to separate tenant id from name in workflowdefs and taskdefs
+export const INFIX_SEPARATOR = '___';
+
+function extractTenantId(workflowName) {
+    const idx = workflowName.indexOf(INFIX_SEPARATOR);
+    if (idx === -1) {
+        logger.error(`Value '${workflowName}' must contain '${INFIX_SEPARATOR}'`);
+        throw new Error('Value must contain INFIX_SEPARATOR');
+    }
+    if (workflowName.substr(idx + 1).indexOf(INFIX_SEPARATOR) > -1) {
+        logger.error(`Value '${workflowName}' must contain '${INFIX_SEPARATOR}' exactly once`);
+        throw new Error('Value must contain INFIX_SEPARATOR exactly once');
+    }
+    return workflowName.substr(0, idx);
+}
+
 const vault = VaultClient({
     "apiVersion": "v1",
     "endpoint": config.VAULT_ADDR,
@@ -55,9 +71,14 @@ const SECRET_FIELD_REGEX = '([a-zA-Z0-9]+)';
 const SECRET_SUFFIX = '___';
 const SECRET_REGEX = new RegExp(SECRET_PREFIX + SECRET_PATH_REGEX + SECRET_VAR_FIELD_SEPARATOR + SECRET_FIELD_REGEX + SECRET_SUFFIX);
 
-async function obtainSecretFromVault(path, field) {
-    const finalPath = config.VAULT_PATH_PREFIX + path; //TODO tenants
-    console.debug('obtainSecretFromVault', {path, field, finalPath});
+async function obtainSecretFromVault(tenantId, path, field) {
+    const pathPrefix = replaceAll(config.VAULT_PATH_PREFIX, '%TENANT_ID%', tenantId);
+    if (pathPrefix == config.VAULT_PATH_PREFIX) {
+        logger.error('Security error: VAULT_PATH_PREFIX does not contain %TENANT_ID%');
+        throw new Error('Security error: VAULT_PATH_PREFIX does not contain %TENANT_ID%');
+    }
+    const finalPath = pathPrefix + path;
+    logger.verbose('obtainSecretFromVault', {path, field, finalPath});
     try {
         const response = await vault.read(finalPath);
         if (config.VAULT_VERSIONED_KV==='true') {
@@ -80,25 +101,25 @@ function replaceAll(str, toBeReplaced, newSubstr) {
     return str;
 }
 
-async function replaceSecretsInString(str) {
+async function replaceSecretsInString(str, tenantId) {
     let r;
     while(r = SECRET_REGEX.exec(str)) {
         const toBeReplaced = r[0];
         const path = r[1];
         const field = r[2];
-        const payload = await obtainSecretFromVault(path, field);
+        const payload = await obtainSecretFromVault(tenantId, path, field);
         str = replaceAll(str, toBeReplaced, payload);
     }
     return str;
 }
 
-async function replaceSecrets(input) {
+async function replaceSecrets(input, tenantId) {
     for (const key in input) {
         const val = input[key];
         if (typeof val === 'object') {
-            input[key] = await replaceSecrets(val);
+            input[key] = await replaceSecrets(val, tenantId);
         } else if (typeof val === 'string') {
-            input[key] = await replaceSecretsInString(val);
+            input[key] = await replaceSecretsInString(val, tenantId);
         }
     }
     return input;
@@ -110,10 +131,12 @@ async function replaceSecrets(input) {
 export const registerHttpWorker = async () => conductorClient.registerWatcher(
     httpTaskDef.name,
     async (data, updater) => {
+        const tenantId = extractTenantId(data.workflowType);
+        // must contain exactly once ___ infix separator, extract name of tenant
         const rawInput = data.inputData.http_request;
         try {
-            logger.verbose(`Received task data type: ${data.taskType} data: ${JSON.stringify(rawInput)}`);
-            const input = await replaceSecrets(rawInput);
+            logger.verbose('Received task',  { data: rawInput, tenantId } );
+            const input = await replaceSecrets(rawInput, tenantId);
             const httpOptions = conductorHttpParamsToNodejsHttpParams(
                 input.uri,
                 input.method,
@@ -149,7 +172,7 @@ export const registerTaskDef = async() => {
     try {
         await conductorClient.registerTaskDefs([httpTaskDef]);
     } catch (err) {
-        console.error('Cannot register taskdef', err, err?.response?.data);
+        logger.error('Cannot register taskdef', err, err?.response?.data);
         throw err;
     }
 }

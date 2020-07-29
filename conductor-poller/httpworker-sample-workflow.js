@@ -69,11 +69,6 @@ function sleep(ms) {
 }
 
 async function main() {
-    if (config.TEST_SKIP_VAULT_INSERTION == undefined || config.TEST_SKIP_VAULT_INSERTION === 'false') {
-        console.log('Writing sample data to Vault', {prefix: config.VAULT_PATH_PREFIX});
-        await vault.write(config.VAULT_PATH_PREFIX + 'key1', {f1:1, f2:2});
-        await vault.write(config.VAULT_PATH_PREFIX +'key2', {f1:10, f2:20});
-    }
     console.log('Sending workflow to Conductor');
     await conductorClient.updateWorkflowDefs([sampleWorkflowDef]);
     const workflowId = (await conductorClient.startWorkflow(sampleWorkflowDef.name, input)).data;
@@ -94,7 +89,7 @@ async function main() {
         }
         await sleep(100);
     }
-    if (config.TEST_DELTE_WORKFLOW != undefined) {
+    if (config.TEST_DELTE_WORKFLOW != 'false') {
         console.log('Deleting the workflowdef', {name:sampleWorkflowDef.name});
         await conductorClient.unRegisterWorkflowDef(sampleWorkflowDef.name);
     }

@@ -56,7 +56,7 @@ It is possible to use the `node-vault` library to read the secrets
 from v2 keystore by prepending `data/` to the path. Poller can insert this prefix
 automatically to each Vault request. Configuration can be set via environemt variable:
 ```
-VAULT_PATH_PREFIX=secret/data/
+VAULT_PATH_PREFIX=secret/data/mypath/%TENANT_ID%/
 VAULT_VERSIONED_KV=true
 ```
 
@@ -64,8 +64,6 @@ or via `.env` file.
 
 Note that writing to the versioned datastore is
 [not supported](https://github.com/kr1sp1n/node-vault/issues/82).
-Therefore, when running the integration test, you must enter the secrets
-manually and use `TEST_SKIP_VAULT_INSERTION=true`.
 
 #### Legacy KV store (v1)
 For testing the old KV store API, we need to switch `secrets/` store back to v1.
@@ -75,23 +73,33 @@ vault secrets enable --version=1 -path=secret kv
 ```
 Make sure Poller is configured for the old KV store API:
 ```
-VAULT_PATH_PREFIX=secret/
+VAULT_PATH_PREFIX=secret/mypath/%TENANT_ID%/
 VAULT_VERSIONED_KV=false
 ```
 
 ## Testing
-### Automated testing
-To create a sample workflow with http task and execute it, run
+
+To test multi tenancy support, create a tenant and set the variable.
 ```sh
-docker-compose exec http-worker-poller yarn run integration-test
+export TEST_TENANT_ID=fb-test
+```
+Following data must be inserted to Valut before the test no matter which KV version is used:
+```sh
+vault kv put secret/mypath/${TEST_TENANT_ID}/key1 f1=1 f2=2
+vault kv put secret/mypath/${TEST_TENANT_ID}/key2 f1=10 f2=20
+```
+
+### Automated testing
+To create a sample workflow with http task and execute it, in `integration` folder run
+```sh
+docker-compose exec -e TEST_TENANT_ID=$TEST_TENANT_ID http-worker-poller yarn run integration-test
+```
+or locally in current folder
+```sh
+TEST_DELTE_WORKFLOW=true VAULT_ADDR=http://localhost:8200 CONDUCTOR_URL=http://localhost:8050/api yarn run integration-test
 ```
 Last line should read `All OK`.
 
-The test puts following data to Vault:
-```sh
-vault kv put secret/key1 f1=1 f2=2
-vault kv put secret/key2 f1=10 f2=20
-```
 Then it executes a workflow with http task that POSTs some data
 with secret variables to httpbin.org and then checks response.
 
