@@ -1,6 +1,7 @@
 {
   "name": "httpworker",
   "version": "1.0.0",
+  "license": "BSD-3-Clause-No-Nuclear-Warranty",
   "description": "",
   "scripts": {
     "start:downloader": "node --unhandled-rejections=strict -r @babel/register downloader/downloader-grpc-server.js",
