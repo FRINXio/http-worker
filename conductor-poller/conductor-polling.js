@@ -54,11 +54,12 @@ async function updateWorkflowState(workflowInstanceId, taskId, grpcResponse) {
     });
 }
 
-async function markWorkflowFailed(workflowInstanceId, taskId) {
+async function markWorkflowFailed(workflowInstanceId, taskId, errMsg) {
     await conductorClient.updateTask({
         workflowInstanceId: workflowInstanceId,
         taskId: taskId,
         status: 'FAILED',
+        logs: ['HTTP request failed: ' + errMsg]
     });
 }
 
@@ -153,7 +154,7 @@ export const registerHttpWorker = async () => conductorClient.registerWatcher(
                 async (err, grpcResponse) => {
                     if (err != null) {
                         logger.warn('Error while sending grpc request', err);
-                        await markWorkflowFailed(data.workflowInstanceId, data.taskId);
+                        await markWorkflowFailed(data.workflowInstanceId, data.taskId, err.message);
                     } else {
                         logger.info(`Response from HTTP worker was received with status code: ${grpcResponse.statusCode}`);
                         await updateWorkflowState(data.workflowInstanceId, data.taskId, grpcResponse);
@@ -161,7 +162,7 @@ export const registerHttpWorker = async () => conductorClient.registerWatcher(
                 });
         } catch (error) {
             logger.error(`Unable to do HTTP request because: ${error}. I am failing the task with ID: ${data.taskId} in workflow with ID: ${data.workflowInstanceId}`);
-            await markWorkflowFailed(data.workflowInstanceId, data.taskId);
+            await markWorkflowFailed(data.workflowInstanceId, data.taskId, error.message);
         }
     },
     {pollingIntervals: 1000, autoAck: true, maxRunner: 1},
