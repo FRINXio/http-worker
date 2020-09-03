@@ -5,9 +5,9 @@
   "description": "",
   "scripts": {
     "start:downloader": "node --unhandled-rejections=strict -r @babel/register downloader/downloader-grpc-server.js",
-    "start:downloader-dev": "nodemon --unhandled-rejections=strict -r @babel/register downloader/downloader-grpc-server.js",
+    "start:downloader-dev": "nodemon --exitcrash --unhandled-rejections=strict -r @babel/register downloader/downloader-grpc-server.js",
     "start:poller": "node --unhandled-rejections=strict -r @babel/register conductor-poller/start-conductor-poller.js",
-    "start:poller-dev": "nodemon --unhandled-rejections=strict -r @babel/register conductor-poller/start-conductor-poller.js",
+    "start:poller-dev": "nodemon --exitcrash --unhandled-rejections=strict -r @babel/register conductor-poller/start-conductor-poller.js",
     "integration-test": "node --unhandled-rejections=strict -r @babel/register conductor-poller/httpworker-sample-workflow.js"
   },
   "dependencies": {
