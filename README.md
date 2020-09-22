@@ -54,13 +54,9 @@ Dev mode also turns on
 #### Versioned KV store
 It is possible to use the `node-vault` library to read the secrets
 from v2 keystore by prepending `data/` to the path. Poller can insert this prefix
-automatically to each Vault request. Configuration can be set via environemt variable:
-```
-VAULT_PATH_PREFIX=secret/data/mypath/%TENANT_ID%/
-VAULT_VERSIONED_KV=true
-```
-
-or via `.env` file.
+automatically to each Vault request.
+Configuration can be set via environemt variable or or via `.env` file,
+see `.env-DOCKER-SAMPLE` section about versioned KV store.
 
 Note that writing to the versioned datastore is
 [not supported](https://github.com/kr1sp1n/node-vault/issues/82).
@@ -71,11 +67,9 @@ For testing the old KV store API, we need to switch `secrets/` store back to v1.
 vault secrets disable secret/
 vault secrets enable --version=1 -path=secret kv
 ```
-Make sure Poller is configured for the old KV store API:
-```
-VAULT_PATH_PREFIX=secret/mypath/%TENANT_ID%/
-VAULT_VERSIONED_KV=false
-```
+Make sure Poller is configured for the old KV store API.
+Configuration can be set via environemt variable or or via `.env` file,
+see `.env-DOCKER-SAMPLE` section about versioned KV store.
 
 ## Testing
 
@@ -85,8 +79,8 @@ export TEST_TENANT_ID=fb-test
 ```
 Following data must be inserted to Valut before the test no matter which KV version is used:
 ```sh
-vault kv put secret/mypath/${TEST_TENANT_ID}/key1 f1=1 f2=2
-vault kv put secret/mypath/${TEST_TENANT_ID}/key2 f1=10 f2=20
+vault kv put secret/tenants/${TEST_TENANT_ID}/key1 f1=1 f2=2
+vault kv put secret/tenants/${TEST_TENANT_ID}/key2 f1=10 f2=20
 ```
 
 ### Automated testing
@@ -127,7 +121,8 @@ After starting all containers, create new workflow with following raw task:
 Run the workflow with an URL, output of the task will contain the download result.
 
 # Vault Agent
-Vault Agent is a 'sidecar' process which does auth and token renewal & rotation. This is not handled in poller app.
+[Vault Agent](https://www.vaultproject.io/docs/agent) is a 'sidecar' process which does auth and token renewal & rotation.
+This is not handled in poller app.
 Vault agent acts as a proxy to Vault. There is no need to send `VAULT_TOKEN`, however if present, the agent will
 forward it instead of the locally maintained one.
 
@@ -241,7 +236,6 @@ Run the test mentioned above, it should succeed when Vault Agent is up.
 
 # More info about Vault
 * [Getting started - Auth using HTTP API](https://learn.hashicorp.com/vault/getting-started/apis)
-* [Vault Agent](https://www.vaultproject.io/docs/agent)
 * [Generating RSA keypair](https://github.com/hashicorp/vault/issues/5106#issuecomment-415897824)
 * [Vault Agent auto-auth using JWT](https://www.vaultproject.io/docs/agent/autoauth/methods/jwt)
 * [Vault JWT auth](https://www.vaultproject.io/docs/auth/jwt)
