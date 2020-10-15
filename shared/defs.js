@@ -4,6 +4,7 @@ export const taskDefName = 'GLOBAL___HTTP_task';
 
 export const httpTaskDef = {
     name: taskDefName,
+    ownerEmail: 'example@example.com',
     retryCount: config.CONDUCTOR_TASK_RETRY_COUNT,
     timeoutSeconds: config.CONDUCTOR_TASK_TIMEOUT_IN_SECS,
     inputKeys: ['http_request'],
