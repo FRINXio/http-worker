@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "http-worker-poller.fullname" . }}
+  labels:
+    {{- include "http-worker-poller.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "http-worker-poller.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "http-worker-poller.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "http-worker-poller.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        # TODO: securityContext, resources, liveness/readiness probes
+        - name: http-worker-poller
+          image: "{{ .Values.image.httpWorkerPollerRepo }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: CONDUCTOR_URL
+              value: {{ .Values.params.conductorApiUrl }}
+            - name: HTTPWORKER_BIND_ADDRESS
+              value: 0.0.0.0:50051
+            - name: HTTPWORKER_ADDRESS
+              value: http-worker-downloader:50051
+            - name: OVERALL_LOG_LEVEL
+              value: debug
+            - name: CONDUCTOR_TASK_RETRY_COUNT
+              value: "0"
+            - name: CONDUCTOR_TASK_TIMEOUT_IN_SECS
+              value: "10"
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
