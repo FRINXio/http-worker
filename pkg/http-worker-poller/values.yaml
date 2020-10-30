@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   pullPolicy: Always
   tag: latest
-  httpWorkerPollerRepo: facebookconnectivity-hub-docker.jfrog.io/http_worker_poller
+  name: http_worker_poller
 
 params:
   conductorApiUrl: http://conductor:8089/api

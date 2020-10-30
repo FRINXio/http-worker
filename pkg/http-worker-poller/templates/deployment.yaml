@@ -30,7 +30,7 @@ spec:
       containers:
         # TODO: securityContext, resources, liveness/readiness probes
         - name: http-worker-poller
-          image: "{{ .Values.image.httpWorkerPollerRepo }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.REGISTRY }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: CONDUCTOR_URL

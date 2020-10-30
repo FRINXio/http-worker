@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: facebookconnectivity-hub-docker.jfrog.io/http_worker_downloader
+  name: http_worker_downloader
   pullPolicy: Always
   tag: "latest"
 
