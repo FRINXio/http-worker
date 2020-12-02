@@ -149,8 +149,13 @@ export const registerHttpWorker = async () => conductorClient.registerWatcher(
                 input.contentType,
                 input.cookies,
             );
-
-            sendGrpcRequest(httpOptions, JSON.parse(input.body),
+            let body = input.body;
+            try {
+                body = JSON.parse(body);
+            }catch {
+                // not a valid json, use default string value
+            }
+            sendGrpcRequest(httpOptions, body,
                 async (err, grpcResponse) => {
                     if (err != null) {
                         logger.warn('Error while sending grpc request', err);
