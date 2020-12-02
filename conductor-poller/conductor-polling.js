@@ -150,7 +150,7 @@ export const registerHttpWorker = async () => conductorClient.registerWatcher(
                 input.cookies,
             );
 
-            sendGrpcRequest(httpOptions, input.body,
+            sendGrpcRequest(httpOptions, JSON.parse(input.body),
                 async (err, grpcResponse) => {
                     if (err != null) {
                         logger.warn('Error while sending grpc request', err);
