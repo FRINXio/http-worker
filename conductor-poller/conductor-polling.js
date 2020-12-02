@@ -151,7 +151,7 @@ export const registerHttpWorker = async () => conductorClient.registerWatcher(
             );
             let body = input.body;
             try {
-                body = JSON.parse(body);
+                body = JSON.stringify(body);
             }catch {
                 // not a valid json, use default string value
             }
